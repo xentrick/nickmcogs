@@ -17,6 +17,7 @@ from redbot.core.i18n import Translator, cog_i18n
 from io import BytesIO
 import functools
 import textwrap
+from pathlib import Path
 
 log = logging.getLogger("red.RSCBot.Leveler")
 
@@ -171,7 +172,7 @@ class Leveler(commands.Cog):
         #font2 = ImageFont.truetype(fontpath, 22)
         #font3 = ImageFont.truetype(fontpath, 32)
 
-        rsc_font = "/home/rscbotadmin/fonts/Apotek_Black.otf"
+        rsc_font = f"{Path.home()}fonts/Apotek_Black.otf"
 
         font1 = ImageFont.truetype(rsc_font, 18)
         font2 = ImageFont.truetype(rsc_font, 22)
