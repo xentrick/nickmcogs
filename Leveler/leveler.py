@@ -8,6 +8,7 @@ from redbot.core.data_manager import bundled_data_path
 from redbot.core.utils.menus import menu, DEFAULT_CONTROLS
 import asyncio
 import datetime
+import json
 from .userprofile import UserProfile
 from PIL import Image, ImageDraw, ImageFont
 from math import floor, ceil
@@ -467,6 +468,26 @@ class Leveler(commands.Cog):
             await ctx.send(_("Role deleted."))
         else:
             await ctx.send(_("Removed a role from the list."))
+
+    @roles.command()
+    @checks.mod_or_permissions(manage_messages=True)
+    @commands.guild_only()
+    async def removelevel(self, ctx, level: str):
+        """Remove a level from the config"""
+        lvls = await self.profiles._get_guild_roles(ctx.guild)
+        if level not in lvls:
+            await ctx.send(_(f"**{level}** does not exist."))
+        else:
+            await self.profiles._remove_guild_level(ctx.guild, level)
+            await ctx.send(_(f"Removed **{level}** from guild."))
+
+    @roles.command()
+    @checks.mod_or_permissions(manage_messages=True)
+    @commands.guild_only()
+    async def printraw(self, ctx):
+        """Print raw JSON for configured levels"""
+        lvls = await self.profiles._get_guild_roles(ctx.guild)
+        await ctx.send(f"```json\n{json.dumps(lvls, indent=2)}\n```")
 
     @roles.command()
     @checks.mod_or_permissions(manage_messages=True)

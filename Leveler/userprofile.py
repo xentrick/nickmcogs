@@ -119,6 +119,15 @@ class UserProfile:
                 await self.data.guild(guild).roles.set(rolelist)
                 return
 
+    async def _remove_guild_level(self, guild: discord.Guild, lvl: str):
+        rolelist = await self.data.guild(guild).roles()
+        for k in rolelist.keys():
+            if k == lvl:
+                del rolelist[k]
+                await self.data.guild(guild).roles.set(rolelist)
+                return
+
+
     async def _get_guild_roles(self, guild):
         return await self.data.guild(guild).roles()
 
