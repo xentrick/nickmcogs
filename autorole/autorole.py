@@ -20,7 +20,9 @@ default_settings = {
 log = logging.getLogger("red.Trusty-cogs.autorole")
 
 _ = Translator("Autorole", __file__)
-listener = getattr(commands.Cog, "listener", None)  # red 3.0 backwards compatibility support
+listener = getattr(
+    commands.Cog, "listener", None
+)  # red 3.0 backwards compatibility support
 
 if listener is None:  # thanks Sinbad
 
@@ -73,7 +75,9 @@ class Autorole(commands.Cog):
         if channel.permissions_for(channel.guild.me).send_messages:
             await channel.send(m)
         else:
-            log.info(m + _("\n I also don't have permission to speak in #") + channel.name)
+            log.info(
+                m + _("\n I also don't have permission to speak in #") + channel.name
+            )
 
     async def get_colour(self, channel: discord.TextChannel) -> discord.Colour:
         try:
@@ -96,7 +100,8 @@ class Autorole(commands.Cog):
         user = cast(discord.Member, message.author)
         channel = message.channel
         agree_channel = cast(
-            discord.TextChannel, guild.get_channel(await self.config.guild(guild).AGREE_CHANNEL())
+            discord.TextChannel,
+            guild.get_channel(await self.config.guild(guild).AGREE_CHANNEL()),
         )
         if guild is None:
             return
@@ -117,7 +122,10 @@ class Autorole(commands.Cog):
                 roles = [role for role in guild.roles if role.id in roles_id]
                 for role in roles:
                     await user.add_roles(role, reason=_("Agreed to the rules"))
-                if perms.manage_messages and await self.config.guild(guild).DELETE_KEY():
+                if (
+                    perms.manage_messages
+                    and await self.config.guild(guild).DELETE_KEY()
+                ):
                     try:
                         await message.delete()
                     except Exception:
@@ -137,11 +145,14 @@ class Autorole(commands.Cog):
         # await self._verify_json(None)
         key = await self.config.guild(guild).AGREE_KEY()
         if key is None:
-            key = "".join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+            key = "".join(
+                random.choice(string.ascii_uppercase + string.digits) for _ in range(6)
+            )
             # <3 Stackoverflow http://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python/23728630#23728630
 
         ch = cast(
-            discord.TextChannel, guild.get_channel(await self.config.guild(guild).AGREE_CHANNEL())
+            discord.TextChannel,
+            guild.get_channel(await self.config.guild(guild).AGREE_CHANNEL()),
         )
         msg = await self.config.guild(guild).AGREE_MSG()
         if msg is None:
@@ -211,7 +222,9 @@ class Autorole(commands.Cog):
         channel = guild.get_channel(ch_id)
         chn_name = channel.name if channel is not None else "None"
         chn_mention = channel.mention if channel is not None else "None"
-        role_name_str = ", ".join(role.mention for role in guild.roles if role.id in roles)
+        role_name_str = ", ".join(
+            role.mention for role in guild.roles if role.id in roles
+        )
         if not role_name_str:
             role_name_str = "None"
         if ctx.channel.permissions_for(ctx.me).embed_links:
@@ -366,7 +379,9 @@ class Autorole(commands.Cog):
 
     @agreement.command(name="key")
     @checks.admin_or_permissions(manage_roles=True)
-    async def set_agreement_key(self, ctx: commands.Context, *, key: str = None) -> None:
+    async def set_agreement_key(
+        self, ctx: commands.Context, *, key: str = None
+    ) -> None:
         """
         Set the agreement key
 
@@ -389,7 +404,9 @@ class Autorole(commands.Cog):
 
     @agreement.command(name="message", aliases=["msg"])
     @checks.admin_or_permissions(manage_roles=True)
-    async def set_agreement_msg(self, ctx: commands.Context, *, message: str = None) -> None:
+    async def set_agreement_msg(
+        self, ctx: commands.Context, *, message: str = None
+    ) -> None:
         """
         Set the agreement message
         `{key}` must be included in the message so a user knows what to type in the channel.

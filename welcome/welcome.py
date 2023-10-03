@@ -99,10 +99,16 @@ class Welcome(commands.Cog):
             b = c["ban"]
             u = c["unban"]
 
-            whisper_message = jw["message"] if len(jw["message"]) <= 50 else jw["message"][:50] + "..."
+            whisper_message = (
+                jw["message"]
+                if len(jw["message"]) <= 50
+                else jw["message"][:50] + "..."
+            )
 
             if await ctx.embed_requested():
-                emb = discord.Embed(color=await ctx.embed_color(), title="Current Welcome Settings")
+                emb = discord.Embed(
+                    color=await ctx.embed_color(), title="Current Welcome Settings"
+                )
                 emb.add_field(
                     name="General",
                     inline=False,
@@ -194,14 +200,20 @@ class Welcome(commands.Cog):
         """
 
         guild = ctx.guild
-        target_state = on_off if on_off is not None else not (await self.config.guild(guild).enabled())
+        target_state = (
+            on_off
+            if on_off is not None
+            else not (await self.config.guild(guild).enabled())
+        )
 
         await self.config.guild(guild).enabled.set(target_state)
 
         await ctx.send(f"Welcome is now {ENABLED if target_state else DISABLED}.")
 
     @welcome.command(name="channel")
-    async def welcome_channel(self, ctx: commands.Context, channel: discord.TextChannel) -> None:
+    async def welcome_channel(
+        self, ctx: commands.Context, channel: discord.TextChannel
+    ) -> None:
         """Sets the channel to be used for event notices."""
 
         if not Welcome.__can_speak_in(channel):
@@ -223,7 +235,9 @@ class Welcome(commands.Cog):
         pass
 
     @welcome_join.command(name="toggle")
-    async def welcome_join_toggle(self, ctx: commands.Context, on_off: bool = None) -> None:
+    async def welcome_join_toggle(
+        self, ctx: commands.Context, on_off: bool = None
+    ) -> None:
         """Turns join notices on or off.
 
         If `on_off` is not provided, the state will be flipped.
@@ -232,7 +246,9 @@ class Welcome(commands.Cog):
         await self.__toggle(ctx, on_off, "join")
 
     @welcome_join.command(name="channel")
-    async def welcome_join_channel(self, ctx: commands.Context, channel: discord.TextChannel = None) -> None:
+    async def welcome_join_channel(
+        self, ctx: commands.Context, channel: discord.TextChannel = None
+    ) -> None:
         """Sets the channel to be used specifically for join notices.
 
         If `channel` is not provided, the join-specific channel is cleared.
@@ -241,7 +257,9 @@ class Welcome(commands.Cog):
         await self.__set_channel(ctx, channel, "join")
 
     @welcome_join.command(name="toggledelete")
-    async def welcome_join_toggledelete(self, ctx: commands.Context, on_off: bool = None) -> None:
+    async def welcome_join_toggledelete(
+        self, ctx: commands.Context, on_off: bool = None
+    ) -> None:
         """Turns deletion of previous join notice on or off.
 
         If `on_off` is not provided, the state will be flipped.
@@ -256,7 +274,9 @@ class Welcome(commands.Cog):
         pass
 
     @welcome_join_whisper.command(name="type")
-    async def welcome_join_whisper_type(self, ctx: commands.Context, choice: WhisperType) -> None:
+    async def welcome_join_whisper_type(
+        self, ctx: commands.Context, choice: WhisperType
+    ) -> None:
         """Set if a DM is sent to the new member.
 
         Options:
@@ -273,18 +293,26 @@ class Welcome(commands.Cog):
         await self.config.guild(guild).join.whisper.state.set(whisper_type)
 
         if choice == WhisperType.OFF:
-            await ctx.send(f"I will no longer DM new members, and will send a notice to {channel.mention}.")
+            await ctx.send(
+                f"I will no longer DM new members, and will send a notice to {channel.mention}."
+            )
         elif choice == WhisperType.ONLY:
-            await ctx.send(f"I will now only DM new members, and will not send a notice to {channel.mention}.")
+            await ctx.send(
+                f"I will now only DM new members, and will not send a notice to {channel.mention}."
+            )
         elif choice == WhisperType.BOTH:
-            await ctx.send(f"I will now send a DM to new members, as well as send a notice to {channel.mention}.")
+            await ctx.send(
+                f"I will now send a DM to new members, as well as send a notice to {channel.mention}."
+            )
         elif choice == WhisperType.FALLBACK:
             await ctx.send(
                 f"I will now send a DM to new members, and if that fails I will send the message to {channel.mention}."
             )
 
     @welcome_join_whisper.command(name="message", aliases=["msg"])
-    async def welcome_join_whisper_message(self, ctx: commands.Context, *, msg_format: str) -> None:
+    async def welcome_join_whisper_message(
+        self, ctx: commands.Context, *, msg_format: str
+    ) -> None:
         """Set the message DM'd to new members when they join.
 
         Allows for the following customizations:
@@ -294,7 +322,9 @@ class Welcome(commands.Cog):
 
         await self.config.guild(ctx.guild).join.whisper.message.set(msg_format)
 
-        await ctx.send("I will now use that message format when whispering new members, if whisper is enabled.")
+        await ctx.send(
+            "I will now use that message format when whispering new members, if whisper is enabled."
+        )
 
     @welcome_join.group(name="message", aliases=["msg"])
     async def welcome_join_message(self, ctx: commands.Context) -> None:
@@ -303,7 +333,9 @@ class Welcome(commands.Cog):
         pass
 
     @welcome_join_message.command(name="add")
-    async def welcome_join_message_add(self, ctx: commands.Context, *, msg_format: str) -> None:
+    async def welcome_join_message_add(
+        self, ctx: commands.Context, *, msg_format: str
+    ) -> None:
         """Add a new join message format to be chosen.
 
         Allows for the following customizations:
@@ -334,7 +366,9 @@ class Welcome(commands.Cog):
         await self.__message_list(ctx, "join")
 
     @welcome_join.command(name="botmessage", aliases=["botmsg"])
-    async def welcome_join_botmessage(self, ctx: commands.Context, *, msg_format: str = None) -> None:
+    async def welcome_join_botmessage(
+        self, ctx: commands.Context, *, msg_format: str = None
+    ) -> None:
         """Sets the message format to use for join notices for bots.
 
         Supply no format to use normal join message formats for bots.
@@ -351,9 +385,13 @@ class Welcome(commands.Cog):
         await self.config.guild(ctx.guild).join.bot.set(msg_format)
 
         if msg_format is not None:
-            await ctx.send("Bot join message format set. I will now greet bots with that message.")
+            await ctx.send(
+                "Bot join message format set. I will now greet bots with that message."
+            )
         else:
-            await ctx.send("Bot join message format removed. I will now greet bots like normal members.")
+            await ctx.send(
+                "Bot join message format removed. I will now greet bots like normal members."
+            )
 
     @welcome.group(name="leave")
     async def welcome_leave(self, ctx: commands.Context) -> None:
@@ -362,7 +400,9 @@ class Welcome(commands.Cog):
         pass
 
     @welcome_leave.command(name="toggle")
-    async def welcome_leave_toggle(self, ctx: commands.Context, on_off: bool = None) -> None:
+    async def welcome_leave_toggle(
+        self, ctx: commands.Context, on_off: bool = None
+    ) -> None:
         """Turns leave notices on or off.
 
         If `on_off` is not provided, the state will be flipped.
@@ -371,7 +411,9 @@ class Welcome(commands.Cog):
         await self.__toggle(ctx, on_off, "leave")
 
     @welcome_leave.command(name="channel")
-    async def welcome_leave_channel(self, ctx: commands.Context, channel: discord.TextChannel = None) -> None:
+    async def welcome_leave_channel(
+        self, ctx: commands.Context, channel: discord.TextChannel = None
+    ) -> None:
         """Sets the channel to be used specifically for leave notices.
 
         If `channel` is not provided, the leave-specific channel is cleared.
@@ -380,7 +422,9 @@ class Welcome(commands.Cog):
         await self.__set_channel(ctx, channel, "leave")
 
     @welcome_leave.command(name="toggledelete")
-    async def welcome_leave_toggledelete(self, ctx: commands.Context, on_off: bool = None) -> None:
+    async def welcome_leave_toggledelete(
+        self, ctx: commands.Context, on_off: bool = None
+    ) -> None:
         """Turns deletion of previous leave notice on or off.
 
         If `on_off` is not provided, the state will be flipped.
@@ -395,7 +439,9 @@ class Welcome(commands.Cog):
         pass
 
     @welcome_leave_message.command(name="add")
-    async def welcome_leave_message_add(self, ctx: commands.Context, *, msg_format: str) -> None:
+    async def welcome_leave_message_add(
+        self, ctx: commands.Context, *, msg_format: str
+    ) -> None:
         """Add a new leave message format to be chosen.
 
         Allows for the following customizations:
@@ -432,7 +478,9 @@ class Welcome(commands.Cog):
         pass
 
     @welcome_ban.command(name="toggle")
-    async def welcome_ban_toggle(self, ctx: commands.Context, on_off: bool = None) -> None:
+    async def welcome_ban_toggle(
+        self, ctx: commands.Context, on_off: bool = None
+    ) -> None:
         """Turns ban notices on or off.
 
         If `on_off` is not provided, the state will be flipped.
@@ -441,7 +489,9 @@ class Welcome(commands.Cog):
         await self.__toggle(ctx, on_off, "ban")
 
     @welcome_ban.command(name="channel")
-    async def welcome_ban_channel(self, ctx: commands.Context, channel: discord.TextChannel = None) -> None:
+    async def welcome_ban_channel(
+        self, ctx: commands.Context, channel: discord.TextChannel = None
+    ) -> None:
         """Sets the channel to be used specifically for ban notices.
 
         If `channel` is not provided, the ban-specific channel is cleared.
@@ -450,7 +500,9 @@ class Welcome(commands.Cog):
         await self.__set_channel(ctx, channel, "ban")
 
     @welcome_ban.command(name="toggledelete")
-    async def welcome_ban_toggledelete(self, ctx: commands.Context, on_off: bool = None) -> None:
+    async def welcome_ban_toggledelete(
+        self, ctx: commands.Context, on_off: bool = None
+    ) -> None:
         """Turns deletion of previous ban notice on or off.
 
         If `on_off` is not provided, the state will be flipped.
@@ -465,7 +517,9 @@ class Welcome(commands.Cog):
         pass
 
     @welcome_ban_message.command(name="add")
-    async def welcome_ban_message_add(self, ctx: commands.Context, *, msg_format: str) -> None:
+    async def welcome_ban_message_add(
+        self, ctx: commands.Context, *, msg_format: str
+    ) -> None:
         """Add a new ban message format to be chosen.
 
         Allows for the following customizations:
@@ -502,7 +556,9 @@ class Welcome(commands.Cog):
         pass
 
     @welcome_unban.command(name="toggle")
-    async def welcome_unban_toggle(self, ctx: commands.Context, on_off: bool = None) -> None:
+    async def welcome_unban_toggle(
+        self, ctx: commands.Context, on_off: bool = None
+    ) -> None:
         """Turns unban notices on or off.
 
         If `on_off` is not provided, the state will be flipped.
@@ -511,7 +567,9 @@ class Welcome(commands.Cog):
         await self.__toggle(ctx, on_off, "unban")
 
     @welcome_unban.command(name="channel")
-    async def welcome_unban_channel(self, ctx: commands.Context, channel: discord.TextChannel = None) -> None:
+    async def welcome_unban_channel(
+        self, ctx: commands.Context, channel: discord.TextChannel = None
+    ) -> None:
         """Sets the channel to be used specifically for unban notices.
 
         If `channel` is not provided, the unban-specific channel is cleared.
@@ -520,7 +578,9 @@ class Welcome(commands.Cog):
         await self.__set_channel(ctx, channel, "unban")
 
     @welcome_unban.command(name="toggledelete")
-    async def welcome_unban_toggledelete(self, ctx: commands.Context, on_off: bool = None) -> None:
+    async def welcome_unban_toggledelete(
+        self, ctx: commands.Context, on_off: bool = None
+    ) -> None:
         """Turns deletion of previous unban notice on or off.
 
         If `on_off` is not provided, the state will be flipped.
@@ -535,7 +595,9 @@ class Welcome(commands.Cog):
         pass
 
     @welcome_unban_message.command(name="add")
-    async def welcome_unban_message_add(self, ctx: commands.Context, *, msg_format: str) -> None:
+    async def welcome_unban_message_add(
+        self, ctx: commands.Context, *, msg_format: str
+    ) -> None:
         """Add a new unban message format to be chosen.
 
         Allows for the following customizations:
@@ -586,15 +648,21 @@ class Welcome(commands.Cog):
                         await self.__dm_user(member)
                     except WhisperError:
                         if whisper_type == "fall":
-                            message_format = await self.config.guild(member.guild).join.whisper.message()
-                            await self.__handle_event(guild, member, "join", message_format=message_format)
+                            message_format = await self.config.guild(
+                                member.guild
+                            ).join.whisper.message()
+                            await self.__handle_event(
+                                guild, member, "join", message_format=message_format
+                            )
                             return
 
                     if whisper_type == "only" or whisper_type == "fall":
                         # we're done here
                         return
 
-            await self.__handle_event(guild, member, "join", message_format=message_format)
+            await self.__handle_event(
+                guild, member, "join", message_format=message_format
+            )
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member) -> None:
@@ -622,13 +690,21 @@ class Welcome(commands.Cog):
         """Handler for setting toggles."""
 
         guild: discord.Guild = ctx.guild
-        target_state = on_off if on_off is not None else not (await self.config.guild(guild).get_attr(event).enabled())
+        target_state = (
+            on_off
+            if on_off is not None
+            else not (await self.config.guild(guild).get_attr(event).enabled())
+        )
 
         await self.config.guild(guild).get_attr(event).enabled.set(target_state)
 
-        await ctx.send(f"{event.capitalize()} notices are now {ENABLED if target_state else DISABLED}.")
+        await ctx.send(
+            f"{event.capitalize()} notices are now {ENABLED if target_state else DISABLED}."
+        )
 
-    async def __set_channel(self, ctx: commands.Context, channel: discord.TextChannel, event: str) -> None:
+    async def __set_channel(
+        self, ctx: commands.Context, channel: discord.TextChannel, event: str
+    ) -> None:
         """Handler for setting channels."""
 
         guild: discord.Guild = ctx.guild
@@ -641,19 +717,31 @@ class Welcome(commands.Cog):
             await ctx.send(f"I will now send {event} notices to {channel.mention}.")
         else:
             default_channel = await self.__get_channel(guild, "default")
-            await ctx.send(f"I will now send {event} messages to the default channel, {default_channel.mention}.")
+            await ctx.send(
+                f"I will now send {event} messages to the default channel, {default_channel.mention}."
+            )
 
-    async def __toggledelete(self, ctx: commands.Context, on_off: bool, event: str) -> None:
+    async def __toggledelete(
+        self, ctx: commands.Context, on_off: bool, event: str
+    ) -> None:
         """Handler for setting delete toggles."""
 
         guild: discord.Guild = ctx.guild
-        target_state = on_off if on_off is not None else not (await self.config.guild(guild).get_attr(event).delete())
+        target_state = (
+            on_off
+            if on_off is not None
+            else not (await self.config.guild(guild).get_attr(event).delete())
+        )
 
         await self.config.guild(guild).get_attr(event).delete.set(target_state)
 
-        await ctx.send(f"Deletion of previous {event} notice is now {ENABLED if target_state else DISABLED}")
+        await ctx.send(
+            f"Deletion of previous {event} notice is now {ENABLED if target_state else DISABLED}"
+        )
 
-    async def __message_add(self, ctx: commands.Context, msg_format: str, event: str) -> None:
+    async def __message_add(
+        self, ctx: commands.Context, msg_format: str, event: str
+    ) -> None:
         """Handler for adding message formats."""
 
         guild: discord.Guild = ctx.guild
@@ -670,16 +758,22 @@ class Welcome(commands.Cog):
 
         async with self.config.guild(guild).get_attr(event).messages() as messages:
             if len(messages) == 1:
-                await ctx.send(f"I only have one {event} message format, so I can't let you delete it.")
+                await ctx.send(
+                    f"I only have one {event} message format, so I can't let you delete it."
+                )
                 return
 
             await self.__message_list(ctx, event)
-            await ctx.send(f"Please enter the number of the {event} message format you wish to delete.")
+            await ctx.send(
+                f"Please enter the number of the {event} message format you wish to delete."
+            )
 
             try:
                 num = await Welcome.__get_number_input(ctx, len(messages))
             except asyncio.TimeoutError:
-                await ctx.send(f"Okay, I won't remove any of the {event} message formats.")
+                await ctx.send(
+                    f"Okay, I won't remove any of the {event} message formats."
+                )
                 return
             else:
                 removed = messages.pop(num - 1)
@@ -700,7 +794,12 @@ class Welcome(commands.Cog):
             await ctx.send(box(page))
 
     async def __handle_event(
-        self, guild: discord.guild, user: Union[discord.Member, discord.User], event: str, *, message_format=None
+        self,
+        guild: discord.guild,
+        user: Union[discord.Member, discord.User],
+        event: str,
+        *,
+        message_format=None,
     ) -> None:
         """Handler for actual events."""
 
@@ -721,11 +820,17 @@ class Welcome(commands.Cog):
                     await guild_settings.get_attr(event).last.set(None)
 
                 # send a notice to the channel
-                new_message = await self.__send_notice(guild, user, event, message_format=message_format)
+                new_message = await self.__send_notice(
+                    guild, user, event, message_format=message_format
+                )
                 # store it for (possible) deletion later
-                await guild_settings.get_attr(event).last.set(new_message and new_message.id)
+                await guild_settings.get_attr(event).last.set(
+                    new_message and new_message.id
+                )
 
-    async def __get_channel(self, guild: discord.Guild, event: str) -> discord.TextChannel:
+    async def __get_channel(
+        self, guild: discord.Guild, event: str
+    ) -> discord.TextChannel:
         """Gets the best text channel to use for event notices.
 
         Order of priority:
@@ -758,24 +863,37 @@ class Welcome(commands.Cog):
 
         return channel
 
-    async def __delete_message(self, guild: discord.Guild, message_id: int, event: str) -> None:
+    async def __delete_message(
+        self, guild: discord.Guild, message_id: int, event: str
+    ) -> None:
         """Attempts to delete the message with the given ID."""
 
         try:
-            await (await (await self.__get_channel(guild, event)).fetch_message(message_id)).delete()
+            await (
+                await (await self.__get_channel(guild, event)).fetch_message(message_id)
+            ).delete()
         except discord.NotFound:
             log.warning("Failed to delete message (ID {message_id}): not found")
         except discord.Forbidden:
-            log.warning("Failed to delete message (ID {message_id}): insufficient permissions")
+            log.warning(
+                "Failed to delete message (ID {message_id}): insufficient permissions"
+            )
         except discord.DiscordException:
             log.warning("Failed to delete message (ID {message_id})")
 
     async def __send_notice(
-        self, guild: discord.guild, user: Union[discord.Member, discord.User], event: str, *, message_format=None
+        self,
+        guild: discord.guild,
+        user: Union[discord.Member, discord.User],
+        event: str,
+        *,
+        message_format=None,
     ) -> Optional[discord.Message]:
         """Sends the notice for the event."""
 
-        format_str = message_format or await self.__get_random_message_format(guild, event)
+        format_str = message_format or await self.__get_random_message_format(
+            guild, event
+        )
 
         count = await self.config.guild(guild).get_attr(event).counter()
         plural = ""
@@ -808,10 +926,14 @@ class Welcome(commands.Cog):
             )
             return None
         except discord.DiscordException:
-            log.error(f"Failed to send {event} message to channel ID {channel.id} (server ID {guild.id})")
+            log.error(
+                f"Failed to send {event} message to channel ID {channel.id} (server ID {guild.id})"
+            )
             return None
 
-    async def __get_random_message_format(self, guild: discord.guild, event: str) -> str:
+    async def __get_random_message_format(
+        self, guild: discord.guild, event: str
+    ) -> str:
         """Gets a random message for event of type event."""
 
         async with self.config.guild(guild).get_attr(event).messages() as messages:
@@ -845,11 +967,15 @@ class Welcome(commands.Cog):
             )
             raise WhisperError()
         except discord.DiscordException:
-            log.error(f"Failed to send DM to member ID {member.id} (server ID {member.guild.id})")
+            log.error(
+                f"Failed to send DM to member ID {member.id} (server ID {member.guild.id})"
+            )
             raise WhisperError()
 
     @staticmethod
-    async def __get_number_input(ctx: commands.Context, maximum: int, minimum: int = 0) -> int:
+    async def __get_number_input(
+        ctx: commands.Context, maximum: int, minimum: int = 0
+    ) -> int:
         """Gets a number from the user, minimum < x <= maximum."""
 
         author = ctx.author
@@ -861,7 +987,12 @@ class Welcome(commands.Cog):
             except ValueError:
                 return False
 
-            return num is not None and minimum < num <= maximum and m.author == author and m.channel == channel
+            return (
+                num is not None
+                and minimum < num <= maximum
+                and m.author == author
+                and m.channel == channel
+            )
 
         try:
             msg = await ctx.bot.wait_for("message", check=check, timeout=15.0)

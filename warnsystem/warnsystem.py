@@ -99,10 +99,15 @@ except ImportError:
     from io import BytesIO
 
     log.warn("Outdated redbot, consider updating.")
+
     # I'm the author of this function but it was made for Cog-Creators
     # Source: https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/redbot/core/utils/chat_formatting.py#L478
     def text_to_file(
-        text: str, filename: str = "file.txt", *, spoiler: bool = False, encoding: str = "utf-8"
+        text: str,
+        filename: str = "file.txt",
+        *,
+        spoiler: bool = False,
+        encoding: str = "utf-8",
     ):
         file = BytesIO(text.encode(encoding))
         return discord.File(file, filename, spoiler=spoiler)
@@ -231,7 +236,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
     __author__ = ["retke (El Laggron)"]
 
     # helpers
-    async def call_warn(self, ctx, level, member, reason=None, time=None, ban_days=None):
+    async def call_warn(
+        self, ctx, level, member, reason=None, time=None, ban_days=None
+    ):
         """No need to repeat, let's do what's common to all 5 warnings."""
         reason = await self.api.format_reason(ctx.guild, reason)
         if reason and len(reason) > 2000:  # embed limits
@@ -290,7 +297,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
                     "hierarchy. You can only warn members which top role is lower than yours.\n\n"
                 ).format(member=str(member))
                 + (
-                    _("You can disable this check by using the `[p]warnset hierarchy` command.")
+                    _(
+                        "You can disable this check by using the `[p]warnset hierarchy` command."
+                    )
                     if is_admin
                     else ""
                 )
@@ -367,7 +376,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
                 await asyncio.sleep(5)
 
         if unavailable_members and level < 5:
-            await ctx.send(_("You can only use `--hackban-select` with a level 5 warn."))
+            await ctx.send(
+                _("You can only use `--hackban-select` with a level 5 warn.")
+            )
             return
         reason = await self.api.format_reason(ctx.guild, reason)
         if (log_modlog or log_dm) and reason and len(reason) > 2000:  # embed limits
@@ -429,7 +440,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
                 ),
                 file=file,
             )
-            menus.start_adding_reactions(msg, predicates.ReactionPredicate.YES_OR_NO_EMOJIS)
+            menus.start_adding_reactions(
+                msg, predicates.ReactionPredicate.YES_OR_NO_EMOJIS
+            )
             pred = predicates.ReactionPredicate.yes_or_no(msg, ctx.author)
             try:
                 await self.bot.wait_for("reaction_add", check=pred, timeout=120)
@@ -484,7 +497,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
             if not confirm:
                 if fails:
                     await ctx.send(
-                        _("Done! {failed} {members} out of {total} couldn't be warned.").format(
+                        _(
+                            "Done! {failed} {members} out of {total} couldn't be warned."
+                        ).format(
                             failed=len(fails),
                             members=_("members") if len(fails) > 1 else _("member"),
                             total=total_members,
@@ -512,7 +527,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
     @commands.group(invoke_without_command=True, name="warn")
     @checks.mod_or_permissions(administrator=True)
     @commands.guild_only()
-    async def _warn(self, ctx: commands.Context, member: discord.Member, *, reason: str = None):
+    async def _warn(
+        self, ctx: commands.Context, member: discord.Member, *, reason: str = None
+    ):
         """
         Take actions against a user and log it.
         The warned user will receive a DM.
@@ -523,7 +540,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
 
     @_warn.command(name="1", aliases=["simple"])
     @checks.mod_or_permissions(administrator=True)
-    async def warn_1(self, ctx: commands.Context, member: discord.Member, *, reason: str = None):
+    async def warn_1(
+        self, ctx: commands.Context, member: discord.Member, *, reason: str = None
+    ):
         """
         Set a simple warning on a user.
 
@@ -558,7 +577,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
 
     @_warn.command(name="3", aliases=["kick"])
     @checks.mod_or_permissions(administrator=True)
-    async def warn_3(self, ctx: commands.Context, member: discord.Member, *, reason: str = None):
+    async def warn_3(
+        self, ctx: commands.Context, member: discord.Member, *, reason: str = None
+    ):
         """
         Kick the member from the server.
         """
@@ -566,7 +587,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
 
     @_warn.command(name="4", aliases=["softban"])
     @checks.mod_or_permissions(administrator=True)
-    async def warn_4(self, ctx: commands.Context, member: discord.Member, *, reason: str = None):
+    async def warn_4(
+        self, ctx: commands.Context, member: discord.Member, *, reason: str = None
+    ):
         """
         Softban the member from the server.
 
@@ -854,7 +877,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
         embed = discord.Embed(description=_("User modlog summary."))
         embed.set_author(name=f"{user} | {user.id}", icon_url=user.avatar_url)
         embed.add_field(
-            name=_("Total number of warnings: ") + str(len(cases)), value=warn_field, inline=False
+            name=_("Total number of warnings: ") + str(len(cases)),
+            value=warn_field,
+            inline=False,
         )
         embed.add_field(
             name=_("{len} last warnings").format(len=len(warn_list))
@@ -863,14 +888,18 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
             value="".join(warn_list),
             inline=False,
         )
-        embed.set_footer(text=_("Click on the reactions to scroll through the warnings"))
+        embed.set_footer(
+            text=_("Click on the reactions to scroll through the warnings")
+        )
         embed.colour = user.top_role.colour
         embeds.append(embed)
 
         for i, case in enumerate(cases):
             level = case["level"]
             moderator = ctx.guild.get_member(case["author"])
-            moderator = "ID: " + str(case["author"]) if not moderator else moderator.mention
+            moderator = (
+                "ID: " + str(case["author"]) if not moderator else moderator.mention
+            )
 
             time = self.api._get_datetime(case["time"])
             embed = discord.Embed(
@@ -878,7 +907,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
             )
             embed.set_author(name=f"{user} | {user.id}", icon_url=user.avatar_url)
             embed.add_field(
-                name=_("Level"), value=f"{warning_str(level, False)} ({level})", inline=True
+                name=_("Level"),
+                value=f"{warning_str(level, False)} ({level})",
+                inline=True,
             )
             embed.add_field(name=_("Moderator"), value=moderator, inline=True)
             if case["duration"]:
@@ -900,7 +931,12 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
             controls.update({"✏": self._edit_case, "🗑": self._delete_case})
 
         await menus.menu(
-            ctx=ctx, pages=embeds, controls=controls, message=None, page=index, timeout=60
+            ctx=ctx,
+            pages=embeds,
+            controls=controls,
+            message=None,
+            page=index,
+            timeout=60,
         )
 
     async def _edit_case(
@@ -948,7 +984,10 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
             try:
                 embed: discord.Embed = message.embeds[0]
                 embed.set_field_at(
-                    len(embed.fields) - 2, name=_("Reason"), value=new_reason, inline=False
+                    len(embed.fields) - 2,
+                    name=_("Reason"),
+                    value=new_reason,
+                    inline=False,
                 )
             except IndexError as e:
                 log.error(
@@ -981,7 +1020,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
             return
         embed = discord.Embed()
         member_id = int(
-            re.match(r"(?:.*#[0-9]{4})(?: \| )([0-9]{15,21})", old_embed.author.name).group(1)
+            re.match(
+                r"(?:.*#[0-9]{4})(?: \| )([0-9]{15,21})", old_embed.author.name
+            ).group(1)
         )
         member = self.bot.get_user(member_id) or UnavailableMember(
             self.bot, guild._state, member_id
@@ -995,7 +1036,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
         await message.edit(embed=embed)
         try:
             response = await self.bot.wait_for(
-                "message", check=predicates.MessagePredicate.same_context(ctx), timeout=120
+                "message",
+                check=predicates.MessagePredicate.same_context(ctx),
+                timeout=120,
             )
         except AsyncTimeoutError:
             await message.delete()
@@ -1007,7 +1050,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
         embed.add_field(name=_("New reason"), value=new_reason, inline=False)
         embed.set_footer(text=_("Click on ✅ to confirm the changes."))
         await message.edit(embed=embed)
-        menus.start_adding_reactions(message, predicates.ReactionPredicate.YES_OR_NO_EMOJIS)
+        menus.start_adding_reactions(
+            message, predicates.ReactionPredicate.YES_OR_NO_EMOJIS
+        )
         pred = predicates.ReactionPredicate.yes_or_no(message, ctx.author)
         try:
             await ctx.bot.wait_for("reaction_add", check=pred, timeout=30)
@@ -1027,7 +1072,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
             await message.clear_reactions()
             text = _("The reason was successfully edited!\n")
             if result is False:
-                text += _("*The modlog message couldn't be edited. Check your logs for details.*")
+                text += _(
+                    "*The modlog message couldn't be edited. Check your logs for details.*"
+                )
             await message.edit(content=text, embed=None)
         else:
             await message.clear_reactions()
@@ -1094,7 +1141,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
             return
         embed = discord.Embed()
         member_id = int(
-            re.match(r"(?:.*#[0-9]{4})(?: \| )([0-9]{15,21})", old_embed.author.name).group(1)
+            re.match(
+                r"(?:.*#[0-9]{4})(?: \| )([0-9]{15,21})", old_embed.author.name
+            ).group(1)
         )
         member = self.bot.get_user(member_id) or UnavailableMember(
             self.bot, guild._state, member_id
@@ -1123,14 +1172,18 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
                 "Case #{number} deletion.\n**Click on the reaction to confirm your action.**"
             ).format(number=page)
             if can_unmute or add_roles:
-                description += _("\nNote: Deleting the case will also do the following:")
+                description += _(
+                    "\nNote: Deleting the case will also do the following:"
+                )
                 if can_unmute:
                     description += _("\n- unmute the member")
                 if add_roles:
                     description += _("\n- add all roles back to the member")
             embed.description = description
         await message.edit(embed=embed)
-        menus.start_adding_reactions(message, predicates.ReactionPredicate.YES_OR_NO_EMOJIS)
+        menus.start_adding_reactions(
+            message, predicates.ReactionPredicate.YES_OR_NO_EMOJIS
+        )
         pred = predicates.ReactionPredicate.yes_or_no(message, ctx.author)
         try:
             await ctx.bot.wait_for("reaction_add", check=pred, timeout=30)
@@ -1145,7 +1198,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
         if page == 0:
             # removing entire modlog
             await self.data.custom("MODLOGS", guild.id, member.id).x.set([])
-            log.debug(f"[Guild {guild.id}] Cleared modlog of member {member} (ID: {member.id}).")
+            log.debug(
+                f"[Guild {guild.id}] Cleared modlog of member {member} (ID: {member.id})."
+            )
             await message.clear_reactions()
             await message.edit(content=_("User modlog cleared."), embed=None)
             return
@@ -1174,10 +1229,14 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
             )
         if roles:
             roles = [guild.get_role(x) for x in roles]
-            await member.add_roles(*roles, reason=_("Adding removed roles back after unmute."))
+            await member.add_roles(
+                *roles, reason=_("Adding removed roles back after unmute.")
+            )
         text = _("The case was successfully deleted!")
         if result is False:
-            text += _("*The modlog message couldn't be deleted. Check your logs for details.*")
+            text += _(
+                "*The modlog message couldn't be deleted. Check your logs for details.*"
+            )
         await message.edit(content=_("The case was successfully deleted!"), embed=None)
 
     @commands.command()
@@ -1211,7 +1270,10 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
             text += "\n\n"
             full_text = text + full_text
         pages = [
-            x for x in pagify(full_text, delims=["\n\n", "\n"], priority=True, page_length=1900)
+            x
+            for x in pagify(
+                full_text, delims=["\n\n", "\n"], priority=True, page_length=1900
+            )
         ]
         total_pages = len(pages)
         total_warns = len(warns)
@@ -1222,7 +1284,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
             )
             for i, x in enumerate(pages, start=1)
         ]
-        await menus.menu(ctx=ctx, pages=pages, controls=menus.DEFAULT_CONTROLS, timeout=60)
+        await menus.menu(
+            ctx=ctx, pages=pages, controls=menus.DEFAULT_CONTROLS, timeout=60
+        )
 
     @commands.command()
     @checks.mod_or_permissions(manage_roles=True)
@@ -1258,16 +1322,18 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
                     break
         await member.remove_roles(
             mute_role,
-            reason=_("[WarnSystem] Member unmuted by {author} (ID: {author.id})").format(
-                author=ctx.author
-            ),
+            reason=_(
+                "[WarnSystem] Member unmuted by {author} (ID: {author.id})"
+            ).format(author=ctx.author),
         )
         roles = list(filter(None, [guild.get_role(x) for x in roles]))
         if not roles:
             await ctx.send(_("Member unmuted."))
             return
         await ctx.send(
-            _("Member unmuted. {len_roles} roles to reassign...").format(len_roles=len(roles))
+            _("Member unmuted. {len_roles} roles to reassign...").format(
+                len_roles=len(roles)
+            )
         )
         async with ctx.typing():
             fails = []
@@ -1308,8 +1374,13 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
         try:
             await guild.unban(member)
         except discord.errors.HTTPException as e:
-            await ctx.send(_("Failed to unban the given member. Check your logs for details."))
-            log.error(f"Can't unban user {member.id} from guild {guild} ({guild.id})", exc_info=e)
+            await ctx.send(
+                _("Failed to unban the given member. Check your logs for details.")
+            )
+            log.error(
+                f"Can't unban user {member.id} from guild {guild} ({guild.id})",
+                exc_info=e,
+            )
             return
         case = await self.cache.get_temp_action(guild, member)
         if case and case["level"] == 5:
@@ -1339,7 +1410,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
         # if a member gets unbanned, we check if they were temp banned with warnsystem
         # if it was, we remove the case so it won't unban them a second time
         warns = await self.cache.get_temp_action(guild)
-        to_remove = []  # there can be multiple temp bans, let's not question the moderators
+        to_remove = (
+            []
+        )  # there can be multiple temp bans, let's not question the moderators
         for member, data in warns.items():
             if data["level"] == 2 or int(member) != user.id:
                 continue
@@ -1406,7 +1479,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
     async def on_member_remove(self, member: discord.Member):
         await self.on_manual_action(member.guild, member, 3)
 
-    async def on_manual_action(self, guild: discord.Guild, member: discord.Member, level: int):
+    async def on_manual_action(
+        self, guild: discord.Guild, member: discord.Member, level: int
+    ):
         # most of this code is from Cog-Creators, modlog cog
         # https://github.com/Cog-Creators/Red-DiscordBot/blob/bc21f779762ec9f460aecae525fdcd634f6c2d85/redbot/core/modlog.py#L68
         if not guild.me.guild_permissions.view_audit_log:
@@ -1421,7 +1496,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
         when = discord.utils.utcnow()
         before = when + timedelta(minutes=1)
         after = when - timedelta(minutes=1)
-        await asyncio.sleep(10)  # prevent small delays from causing a 5 minute delay on entry
+        await asyncio.sleep(
+            10
+        )  # prevent small delays from causing a 5 minute delay on entry
         attempts = 0
         action = {
             3: discord.AuditLogAction.kick,
@@ -1436,8 +1513,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
                 #     lambda e: e.target.id == member.id and after < e.created_at < before
                 # )
                 entry = await discord.utils.find(
-                    lambda e: e.target.id == member.id and after < e.created_at < before,
-                    guild.audit_logs(action=action, before=before, after=after)
+                    lambda e: e.target.id == member.id
+                    and after < e.created_at < before,
+                    guild.audit_logs(action=action, before=before, after=after),
                 )
             except discord.Forbidden:
                 break
@@ -1449,7 +1527,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
                         # Don't create modlog entires for the bot's own bans, cogs do this.
                         mod, reason, date = entry.user, entry.reason, entry.created_at
                         if isinstance(member, discord.User):
-                            member = UnavailableMember(self.bot, guild._state, member.id)
+                            member = UnavailableMember(
+                                self.bot, guild._state, member.id
+                            )
                         try:
                             await self.api.warn(
                                 guild,
@@ -1535,7 +1615,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
                     "\n\n\n--- Case {number} ---\nLevel:     {level}\nReason:    {reason}\n"
                 ).format(number=i + 1, **modlog)
                 text += "Date:      {date}\n".format(
-                    date=self.api._format_datetime(self.api._get_datetime(modlog["time"]))
+                    date=self.api._format_datetime(
+                        self.api._get_datetime(modlog["time"])
+                    )
                 )
                 if modlog["duration"]:
                     duration = self.api._get_timedelta(modlog["duration"])
@@ -1544,7 +1626,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
                         raw=modlog["duration"],
                     )
                 if modlog["roles"]:
-                    text += "Roles:     {roles}\n".format(roles=", ".join(modlog["roles"]))
+                    text += "Roles:     {roles}\n".format(
+                        roles=", ".join(modlog["roles"])
+                    )
             file = BytesIO()
             file.write(text.encode("utf-8"))
             files[guild_id] = file
@@ -1555,7 +1639,8 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
             data = await self._red_get_data_for_user(user_id=user_id)
         except Exception as e:
             log.error(
-                f"User {user_id} has requested end user data but an exception occured!", exc_info=e
+                f"User {user_id} has requested end user data but an exception occured!",
+                exc_info=e,
             )
             raise
         else:
@@ -1578,7 +1663,9 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
 
     async def red_delete_data_for_user(self, *, requester: str, user_id: int):
         try:
-            result = await self._red_delete_data_for_user(requester=requester, user_id=user_id)
+            result = await self._red_delete_data_for_user(
+                requester=requester, user_id=user_id
+            )
         except Exception as e:
             log.error(
                 f"User {user_id} has requested end user data deletion but an exception occured!",

@@ -91,7 +91,8 @@ class AdvancedMemberSelect:
 
     def parse_arguments(self, arguments: str):
         parser = NoExitParser(
-            description="Mass member selection in a server for WarnSystem.", add_help=False
+            description="Mass member selection in a server for WarnSystem.",
+            add_help=False,
         )
 
         parser.add_argument(
@@ -129,7 +130,9 @@ class AdvancedMemberSelect:
         parser.add_argument("--has-all-roles", dest="has_all_roles", nargs="+")
         parser.add_argument("--has-none-roles", dest="has_none_roles", nargs="+")
         parser.add_argument("--has-no-roles", dest="has_no_roles", action="store_true")
-        parser.add_argument("--has-exactly-nroles", dest="has_exactly_nroles", nargs=1, type=int)
+        parser.add_argument(
+            "--has-exactly-nroles", dest="has_exactly_nroles", nargs=1, type=int
+        )
         parser.add_argument(
             "--has-more-than-nroles", dest="has_more_than_nroles", nargs=1, type=int
         )
@@ -180,9 +183,13 @@ class AdvancedMemberSelect:
                 self.non_lurker_members(members), " ".join(args.joined_after), "after"
             )
         if args.last_njoins:
-            members = self._last_njoins(self.non_lurker_members(members), args.last_njoins)
+            members = self._last_njoins(
+                self.non_lurker_members(members), args.last_njoins
+            )
         if args.first_njoins:
-            members = self._first_njoins(self.non_lurker_members(members), args.first_njoins)
+            members = self._first_njoins(
+                self.non_lurker_members(members), args.first_njoins
+            )
 
         if args.has_perm:
             members = self._perms(members, [args.has_perm], "perm")
@@ -281,7 +288,9 @@ class AdvancedMemberSelect:
 
     def _last_njoins(self, members: List[discord.Member], number: int):
         try:
-            last_member = sorted(members, key=lambda x: x.joined_at, reverse=True)[number]
+            last_member = sorted(members, key=lambda x: x.joined_at, reverse=True)[
+                number
+            ]
         except IndexError:
             last_member = sorted(members, key=lambda x: x.joined_at, reverse=True)[
                 len(members) - 1
@@ -323,15 +332,19 @@ class AdvancedMemberSelect:
                 if getattr(member.guild_permissions, permissions[0]):
                     return True
             elif requires == "any-perm":
-                if set([x[0] for x in member.guild_permissions if x[1]]).intersection(permissions):
-                    return True
-            elif requires == "all-perms":
-                if set(permissions).issubset([x[0] for x in member.guild_permissions if x[1]]):
-                    return True
-            elif requires == "none-perms":
-                if not set([x[0] for x in member.guild_permissions if x[1]]).intersection(
+                if set([x[0] for x in member.guild_permissions if x[1]]).intersection(
                     permissions
                 ):
+                    return True
+            elif requires == "all-perms":
+                if set(permissions).issubset(
+                    [x[0] for x in member.guild_permissions if x[1]]
+                ):
+                    return True
+            elif requires == "none-perms":
+                if not set(
+                    [x[0] for x in member.guild_permissions if x[1]]
+                ).intersection(permissions):
                     return True
             return False
 
@@ -353,7 +366,10 @@ class AdvancedMemberSelect:
             for role in _roles:
                 try:
                     roles.append(await RoleConverter().convert(self.ctx, role))
-                except (discord.errors.NotFound, discord.ext.commands.errors.BadArgument):
+                except (
+                    discord.errors.NotFound,
+                    discord.ext.commands.errors.BadArgument,
+                ):
                     raise BadArgument(
                         _(
                             "Can't convert `{arg}` from `--{state}` into a "
@@ -369,7 +385,9 @@ class AdvancedMemberSelect:
                 return True
             elif requires == "has-all-roles" and set(roles).issubset(member.roles):
                 return True
-            elif requires == "has-none-roles" and not set(member.roles).intersection(roles):
+            elif requires == "has-none-roles" and not set(member.roles).intersection(
+                roles
+            ):
                 return True
             elif requires == "has-no-roles" and len(member.roles) == 1:
                 return True
@@ -439,7 +457,9 @@ class AdvancedMemberSelect:
             self.reason = " ".join(args.reason or "")
             if args.time:
                 try:
-                    self.time = await TimedeltaConverter().convert(ctx, " ".join(args.time))
+                    self.time = await TimedeltaConverter().convert(
+                        ctx, " ".join(args.time)
+                    )
                 except BadArgument as e:
                     raise BadArgument(
                         _(
@@ -474,6 +494,8 @@ class ValidRegex(Converter):
             result = re.compile(argument)
         except Exception as e:
             log.error("Retrigger conversion error")
-            err_msg = _("`{arg}` is not a valid regex pattern. {e}").format(arg=argument, e=e)
+            err_msg = _("`{arg}` is not a valid regex pattern. {e}").format(
+                arg=argument, e=e
+            )
             raise BadArgument(err_msg)
         return result

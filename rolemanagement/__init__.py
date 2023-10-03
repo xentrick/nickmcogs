@@ -36,7 +36,6 @@ async def maybe_send_owners(bot: Red):
         last_notify = await conf.last_notify()
         cur_uptime = list(bot.uptime.timetuple()[:6])
         if last_notify is None or cur_uptime > last_notify:
-
             await bot.send_to_owners(
                 "This cog still functions, but I suggest you stop using Red and find an "
                 "alternative that cares about the contributions of volunteers or pays their devs. "

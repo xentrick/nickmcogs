@@ -1,9 +1,7 @@
 {
-    "author": [
-        "nickm"
-    ],
+    "author": ["nickm"],
     "install_msg": "I don't take any credit for these Cogs, I simply made modifications to them for new Redbot versions.",
     "name": "nickmcogs",
     "short": "Cogs fixed by nickm",
-    "description": "Fixing cogs for redbot3"
+    "description": "Fixing cogs for redbot3",
 }

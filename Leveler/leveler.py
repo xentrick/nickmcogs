@@ -104,10 +104,14 @@ class Leveler(commands.Cog):
     async def get_avatar(self, user):
         try:
             res = BytesIO()
-            await user.display_avatar.replace(format="png", size=1024).save(res, seek_begin=True)
+            await user.display_avatar.replace(format="png", size=1024).save(
+                res, seek_begin=True
+            )
             return res
         except:
-            async with self._session.get(user.display_avatar.replace(format="png", size=1024)) as r:
+            async with self._session.get(
+                user.display_avatar.replace(format="png", size=1024)
+            ) as r:
                 img = await r.content.read()
                 return BytesIO(img)
 
@@ -139,7 +143,9 @@ class Leveler(commands.Cog):
         im.putalpha(alpha)
         return im
 
-    def make_full_profile(self, avatar_data, user, xp, nxp, lvl, minone, elo, ldb, desc, bg=None):
+    def make_full_profile(
+        self, avatar_data, user, xp, nxp, lvl, minone, elo, ldb, desc, bg=None
+    ):
         img = Image.new("RGBA", (340, 390), (17, 17, 17, 255))
         if bg is not None:
             bg_width, bg_height = bg.size
@@ -160,18 +166,20 @@ class Leveler(commands.Cog):
         img = self.add_corners(img, 10)
         draw = ImageDraw.Draw(img)
         usercolor = (225, 4, 72)  # user.color.to_rgb()
-        aviholder = self.add_corners(Image.new("RGBA", (140, 140), (255, 255, 255, 255)), 10)
-        #nameplate = self.add_corners(Image.new("RGBA", (180, 60), (0, 0, 0, 255)), 10)
+        aviholder = self.add_corners(
+            Image.new("RGBA", (140, 140), (255, 255, 255, 255)), 10
+        )
+        # nameplate = self.add_corners(Image.new("RGBA", (180, 60), (0, 0, 0, 255)), 10)
         xptot = self.add_corners(Image.new("RGBA", (310, 20), (215, 215, 215, 255)), 10)
         img.paste(aviholder, (10, 10), aviholder)
-        #img.paste(nameplate, (155, 10), nameplate)
+        # img.paste(nameplate, (155, 10), nameplate)
         img.paste(xptot, (15, 340), xptot)
 
         fontpath = str(bundled_data_path(self) / "cambria.ttc")
 
-        #font1 = ImageFont.truetype(fontpath, 18)
-        #font2 = ImageFont.truetype(fontpath, 22)
-        #font3 = ImageFont.truetype(fontpath, 32)
+        # font1 = ImageFont.truetype(fontpath, 18)
+        # font2 = ImageFont.truetype(fontpath, 22)
+        # font3 = ImageFont.truetype(fontpath, 32)
 
         rsc_font = f"{Path.home()}/fonts/Apotek_Black.otf"
 
@@ -206,12 +214,23 @@ class Leveler(commands.Cog):
 
         draw.text((154, 316), f"{lprc}%", fill=usercolor, font=font1)
         draw.text((100, 360), (prog_str + f" {xp}/{nxp}"), fill=usercolor, font=font1)
-        draw.text(((font3.getlength(lvl_str) + 20), 180), f"{lvl}", fill=usercolor, font=font3)
-        draw.text(((font3.getlength(ldb_str) + 20), 220), f"{ldb}", fill=usercolor, font=font3)
-        draw.text(((font3.getlength(rank_str) + 20), 260), f"{elo}", fill=usercolor, font=font3)
+        draw.text(
+            ((font3.getlength(lvl_str) + 20), 180), f"{lvl}", fill=usercolor, font=font3
+        )
+        draw.text(
+            ((font3.getlength(ldb_str) + 20), 220), f"{ldb}", fill=usercolor, font=font3
+        )
+        draw.text(
+            ((font3.getlength(rank_str) + 20), 260),
+            f"{elo}",
+            fill=usercolor,
+            font=font3,
+        )
 
         draw.text((162, 14), f"{nick}", fill=usercolor, font=font2)
-        draw.text((162, 40), f"{user.name}#{user.discriminator}", fill=usercolor, font=font1)
+        draw.text(
+            (162, 40), f"{user.name}#{user.discriminator}", fill=usercolor, font=font1
+        )
         margin = 162
         offset = 70
         count = 0
@@ -267,7 +286,9 @@ class Leveler(commands.Cog):
                 data["elo"] = default if default else self.defaultrole
             else:
                 if str(lvl) in roles.keys():
-                    data["elo"] = discord.utils.get(user.guild.roles, id=roles[str(lvl)]).name
+                    data["elo"] = discord.utils.get(
+                        user.guild.roles, id=roles[str(lvl)]
+                    ).name
                 else:
                     tmp = 0
                     log.debug(f"User LVL: {lvl}")
@@ -561,13 +582,23 @@ class Leveler(commands.Cog):
     async def _show(self, ctx):
         """Show the list of channels configured to allow earning experience."""
         emb = discord.Embed()
-        emb.title = _("List of channels configured to allow earning experience on this server.")
+        emb.title = _(
+            "List of channels configured to allow earning experience on this server."
+        )
         emb.description = _("More or less, it's not an exact science")
         channels = await self.profiles._get_guild_channels(ctx.guild)
         if not len(channels):
             return await ctx.send(_("No channels configured"))
         emb.add_field(
-            name="Channels:", value="\n".join([ctx.guild.get_channel(x).mention if ctx.guild.get_channel(x) else str(await self.profiles._remove_guild_channel(ctx.guild, x)) for x in channels])
+            name="Channels:",
+            value="\n".join(
+                [
+                    ctx.guild.get_channel(x).mention
+                    if ctx.guild.get_channel(x)
+                    else str(await self.profiles._remove_guild_channel(ctx.guild, x))
+                    for x in channels
+                ]
+            ),
         )
         await ctx.send(embed=emb)
 
@@ -618,7 +649,15 @@ class Leveler(commands.Cog):
         if not len(channels):
             return await ctx.send(_("No channels configured"))
         emb.add_field(
-            name="Channels:", value="\n".join([ctx.guild.get_channel(x).mention if ctx.guild.get_channel(x) else str(await self.profiles._remove_guild_blacklist(ctx.guild, x)) for x in channels])
+            name="Channels:",
+            value="\n".join(
+                [
+                    ctx.guild.get_channel(x).mention
+                    if ctx.guild.get_channel(x)
+                    else str(await self.profiles._remove_guild_blacklist(ctx.guild, x))
+                    for x in channels
+                ]
+            ),
         )
         await ctx.send(embed=emb)
 
@@ -648,7 +687,9 @@ class Leveler(commands.Cog):
         if member is None:
             member = ctx.message.author
         if await self.profiles._is_registered(member):
-            await self.profiles._set_exp(member, 5 * ((level - 1) ** 2) + (50 * (level - 1)) + 100)
+            await self.profiles._set_exp(
+                member, 5 * ((level - 1) ** 2) + (50 * (level - 1)) + 100
+            )
         else:
             await ctx.send(_("That user is not registered."))
         await ctx.send(member.name + _(" Level set to ") + str(level))
@@ -673,7 +714,9 @@ class Leveler(commands.Cog):
         """Allow you to set a default background for your server members."""
         bg = re.findall(r"(?:http\:|https\:)?\/\/.*\.(?:png|jpg|gif)", url)
         if not bg:
-            await ctx.send(_("Please give a direct link to an image on format png, jpg or gif !"))
+            await ctx.send(
+                _("Please give a direct link to an image on format png, jpg or gif !")
+            )
         else:
             background = bg[0]
             await self.profiles._set_guild_background(ctx.guild, background)
@@ -695,5 +738,7 @@ class Leveler(commands.Cog):
         args are True/False."""
         await self.profiles.data.guild(ctx.guild).lvlup_announce.set(status)
         await ctx.send(
-            _("Levelup announce is now {}.").format(_("enabled") if status else _("disabled"))
+            _("Levelup announce is now {}.").format(
+                _("enabled") if status else _("disabled")
+            )
         )

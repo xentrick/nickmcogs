@@ -46,9 +46,13 @@ class MemoryCache:
         """
         config_data = await self.data.all_guilds()
         mute_roles_cached = len(self.mute_roles)
-        mute_roles = len([x for x in config_data.values() if x["mute_role"] is not None])
+        mute_roles = len(
+            [x for x in config_data.values() if x["mute_role"] is not None]
+        )
         guild_temp_actions_cached = len(self.temp_actions)
-        guild_temp_actions = len([x for x in config_data.values() if x["temporary_warns"]])
+        guild_temp_actions = len(
+            [x for x in config_data.values() if x["temporary_warns"]]
+        )
         temp_actions_cached = sum(len(x) for x in self.temp_actions.values())
         temp_actions = sum((len(x["temporary_warns"]) for x in config_data.values()))
         text = (
@@ -72,7 +76,9 @@ class MemoryCache:
         await self.data.guild(guild).mute_role.set(role.id)
         self.mute_roles[guild.id] = role.id
 
-    async def get_temp_action(self, guild: discord.Guild, member: Optional[discord.Member] = None):
+    async def get_temp_action(
+        self, guild: discord.Guild, member: Optional[discord.Member] = None
+    ):
         guild_temp_actions = self.temp_actions.get(guild.id, {})
         if not guild_temp_actions:
             guild_temp_actions = await self.data.guild(guild).temporary_warns.all()
@@ -82,7 +88,9 @@ class MemoryCache:
             return guild_temp_actions
         return guild_temp_actions.get(member.id)
 
-    async def add_temp_action(self, guild: discord.Guild, member: discord.Member, data: dict):
+    async def add_temp_action(
+        self, guild: discord.Guild, member: discord.Member, data: dict
+    ):
         await self.data.guild(guild).temporary_warns.set_raw(member.id, value=data)
         try:
             guild_temp_actions = self.temp_actions[guild.id]

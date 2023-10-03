@@ -225,7 +225,6 @@ class MassManagementMixin(MixinMeta):
         ]
 
         for part, chunk in enumerate(chunks, 1):
-
             csvf = io.StringIO()
             fieldnames = [
                 "User ID",

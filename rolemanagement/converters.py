@@ -62,7 +62,6 @@ class EmojiRolePairConverter(NamedTuple):
 
     @classmethod
     async def convert(cls, ctx: GuildContext, argument: str):
-
         chunks = shlex.split(argument)
         if not chunks:
             raise BadArgument("Must provide at least one pair.")
@@ -74,7 +73,6 @@ class EmojiRolePairConverter(NamedTuple):
         pairs_gen = _grab_pairs(chunks)
         try:
             for maybe_emoji, maybe_role in pairs_gen:
-
                 if maybe_emoji in pairs:
                     raise BadArgument(
                         "You can't provide the same emoji multiple times."
@@ -114,7 +112,6 @@ class ComplexActionConverter(NamedTuple):
 
     @classmethod
     async def convert(cls, ctx: Context, argument: str):
-
         parser = NoExitParser(description="Role management syntax help", add_help=False)
         parser.add_argument("--has-any", nargs="*", dest="any", default=[])
         parser.add_argument("--has-all", nargs="*", dest="all", default=[])
@@ -181,7 +178,6 @@ class ComplexActionConverter(NamedTuple):
             vals[attr] = await _RoleConverter.convert(ctx, vals[attr])
 
         for attr in ("hasperm", "anyperm", "notperm"):
-
             vals[attr] = [
                 i.replace("_", " ").lower().replace(" ", "_").replace("server", "guild")
                 for i in vals[attr]
@@ -279,7 +275,6 @@ class ComplexSearchConverter(NamedTuple):
             vals[attr] = await _RoleConverter.convert(ctx, vals[attr])
 
         for attr in ("hasperm", "anyperm", "notperm"):
-
             vals[attr] = [
                 i.replace("_", " ").lower().replace(" ", "_").replace("server", "guild")
                 for i in vals[attr]

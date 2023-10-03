@@ -144,7 +144,6 @@ class RoleManagement(
         self._start_task = asyncio.create_task(self.initialization())
 
         def done_callback(fut: asyncio.Future):
-
             try:
                 fut.exception()
             except asyncio.CancelledError:
@@ -229,7 +228,6 @@ class RoleManagement(
 
         member = ctx.guild.get_member(user_id)
         if member:
-
             try:
                 await self.update_roles_atomically(who=member, give=[role])
             except PermissionOrHierarchyException:
@@ -237,7 +235,6 @@ class RoleManagement(
             else:
                 await ctx.maybe_send_embed("They are in the guild...assigned anyway.")
         else:
-
             async with self.config.member_from_ids(
                 ctx.guild.id, user_id
             ).roles() as sticky:
@@ -249,7 +246,7 @@ class RoleManagement(
     @checks.is_owner()
     @commands.command(name="rrcleanup", hidden=True)
     async def rolemanagementcleanup(self, ctx: commands.GuildContext):
-        """ :eyes: """
+        """:eyes:"""
         data = await self.config.custom("REACTROLE").all()
 
         key_data = {}
@@ -392,7 +389,6 @@ class RoleManagement(
         _emoji: Optional[Union[discord.Emoji, str]]
 
         for emoji, role in pairs.items():
-
             _emoji = discord.utils.find(lambda e: str(e) == emoji, self.bot.emojis)
             if _emoji is None:
                 try:
@@ -511,7 +507,6 @@ class RoleManagement(
             return
 
         if self_assign:
-
             await ctx.send(
                 "This role is self assignable, "
                 "but not self removable. "
@@ -578,7 +573,6 @@ class RoleManagement(
                     )
 
         else:
-
             await ctx.send(
                 "This role is neither self assignable not self removable. "
                 "This rolebind will be essentiall useless without changing that. "
@@ -1105,7 +1099,6 @@ class RoleManagement(
         for role in roles:
             # pylint: disable=E1133
             async for message_id, emoji_info, data in self.get_react_role_entries(role):
-
                 channel_id = data.get("channelid", None)
                 if channel_id:
                     link = linkfmt.format(
