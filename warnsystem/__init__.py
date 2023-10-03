@@ -28,7 +28,7 @@ from laggron_utils import init_logger, close_logger
 from .warnsystem import WarnSystem
 
 _ = Translator("WarnSystem", __file__)
-log = logging.getLogger("red.laggron.warnsystem")
+log = logging.getLogger("red.nickmcogs.warnsystem")
 
 
 async def _save_backup(config):

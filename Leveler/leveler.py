@@ -20,7 +20,7 @@ import functools
 import textwrap
 from pathlib import Path
 
-log = logging.getLogger("red.RSCBot.Leveler")
+log = logging.getLogger("red.nickmcogs.Leveler")
 
 _ = Translator("Leveler", __file__)
 

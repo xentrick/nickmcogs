@@ -17,7 +17,7 @@ default_settings = {
     "DELETE_KEY": False,
 }
 
-log = logging.getLogger("red.Trusty-cogs.autorole")
+log = logging.getLogger("red.nickmcogs.autorole")
 
 _ = Translator("Autorole", __file__)
 listener = getattr(
@@ -185,7 +185,11 @@ class Autorole(commands.Cog):
             await self._no_perms()
             return
         for role in roles:
-            await member.add_roles(role, reason=_("Joined the server"))
+            try:
+                await member.add_roles(role, reason=_("Joined the server"))
+            except discord.errors.NotFound as exc: 
+                log.warning(f"Error adding roles to {member.name}. {exc.status} (error code {exc.code}): {exc.text}")
+                return
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member) -> None:

@@ -24,7 +24,7 @@ except RuntimeError:
 from .cache import MemoryCache
 from . import errors
 
-log = logging.getLogger("red.laggron.warnsystem")
+log = logging.getLogger("red.nickmcogs.warnsystem")
 _ = Translator("WarnSystem", __file__)
 id_pattern = re.compile(r"([0-9]{15,21})$")
 

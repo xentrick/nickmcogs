@@ -24,7 +24,7 @@ from .cache import MemoryCache
 from .converters import AdvancedMemberSelect
 from .settings import SettingsMixin
 
-log = logging.getLogger("red.laggron.warnsystem")
+log = logging.getLogger("red.nickmcogs.warnsystem")
 _ = Translator("WarnSystem", __file__)
 BaseCog = getattr(commands, "Cog", object)
 

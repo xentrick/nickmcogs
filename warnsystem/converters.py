@@ -14,7 +14,7 @@ from redbot.core.i18n import Translator
 from .api import UnavailableMember
 
 _ = Translator("WarnSystem", __file__)
-log = logging.getLogger("red.laggron.warnsystem")
+log = logging.getLogger("red.nickmcogs.warnsystem")
 
 
 # credit to mikeshardmind (Sinbad) for parse_time

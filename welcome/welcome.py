@@ -14,7 +14,7 @@ from .safemodels import SafeGuild, SafeMember
 
 __author__ = "tmerc"
 
-log = logging.getLogger("red.tmerc.welcome")
+log = logging.getLogger("red.nickmcogs.welcome")
 
 ENABLED = "enabled"
 DISABLED = "disabled"

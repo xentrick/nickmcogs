@@ -14,7 +14,7 @@ from .converters import (
 )
 from .exceptions import RoleManagementException
 
-log = logging.getLogger("red.sinbadcogs.rolemanagement.massmanager")
+log = logging.getLogger("red.nickmcogs.rolemanagement.massmanager")
 
 
 class MassManagementMixin(MixinMeta):

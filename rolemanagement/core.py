@@ -38,7 +38,7 @@ class AddOnceHandler(logging.FileHandler):
     """
 
 
-log = logging.getLogger("red.sinbadcogs.rolemanagement")
+log = logging.getLogger("red.nickmcogs.rolemanagement")
 
 
 for handler in log.handlers:
