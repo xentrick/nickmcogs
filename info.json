@@ -4,6 +4,7 @@
     ],
     "install_msg": "I don't take any credit for these Cogs, I simply made modifications to them for new Redbot versions.",
     "name": "nickmcogs",
-    "short": "Cogs fixed by nickm"
+    "short": "Cogs fixed by nickm",
+    "description": "Collection of cogs that weren't updated to redbotv3 and or I have made changes to"
 }
    
