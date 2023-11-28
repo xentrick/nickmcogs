@@ -690,6 +690,7 @@ class Leveler(commands.Cog):
             await self.profiles._set_exp(
                 member, 5 * ((level - 1) ** 2) + (50 * (level - 1)) + 100
             )
+            await self.profiles._check_role_member(member)
         else:
             await ctx.send(_("That user is not registered."))
         await ctx.send(member.name + _(" Level set to ") + str(level))
@@ -703,6 +704,7 @@ class Leveler(commands.Cog):
             member = ctx.message.author
         if await self.profiles._is_registered(member):
             await self.profiles._set_exp(member, xp)
+            await self.profiles._check_role_member(member)
         else:
             await ctx.send(_("That user is not registered."))
         await ctx.send(member.name + _("'s XP set to ") + str(xp))

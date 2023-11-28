@@ -2,6 +2,10 @@ from redbot.core import Config
 import asyncio
 import discord
 
+import logging
+
+log = logging.getLogger("red.nickmcogs.Leveler.userprofile")
+
 
 class UserProfile:
     def __init__(self):
@@ -85,16 +89,22 @@ class UserProfile:
         elif xp < lvlup and lvl > 1:
             await self._downgrade_level(member)
 
-    async def _check_role_member(self, member):
+    async def _check_role_member(self, member: discord.Member):
         roles = await self.data.guild(member.guild).roles()
         lvl = await self.data.member(member).level()
+        log.debug(f"lvl: {lvl}")
+        log.debug(f"roles: {roles}")
         for k, v in roles.items():
             if lvl == int(k):
                 rl = discord.utils.get(member.guild.roles, id=v)
                 if rl in member.roles:
                     return True
                 else:
-                    await member.add_roles(rl)
+                    to_remove = [member.guild.get_role(r) for r in roles.values() if r != v]
+                    log.debug(f"Removing old leveler roles: {to_remove}")
+                    await member.remove_roles(*to_remove, reason="User leveled up")
+                    log.debug(f"Adding leveler role: {rl.name}")
+                    await member.add_roles(rl, reason="User leveled up")
                     return True
             else:
                 pass
