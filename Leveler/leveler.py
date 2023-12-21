@@ -206,7 +206,7 @@ class Leveler(commands.Cog):
         draw.text((10, 180), lvl_str, fill="white", font=font3)
         draw.text((10, 220), ldb_str, fill="white", font=font3)
         draw.text((10, 260), rank_str, fill="white", font=font3)
-        nick = user.global_name
+        nick = user.display_name
         if font2.getlength(nick) > 150:
             nick = nick[:15] + "..."
 
