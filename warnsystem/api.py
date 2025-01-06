@@ -1066,11 +1066,15 @@ class API:
                     elif level == 3:
                         await guild.kick(member, reason=audit_reason)
                     elif level == 4:
+                        if ban_days:
+                            ban_seconds = ban_days * 86400
+                        else:
+                            ban_seconds = await self.data.guild(guild).bandays.softban() * 86400
+
                         await guild.ban(
                             member,
                             reason=audit_reason,
-                            delete_message_days=ban_days
-                            or await self.data.guild(guild).bandays.softban(),
+                            delete_message_seconds=ban_seconds,
                         )
                         await guild.unban(
                             member,
@@ -1079,11 +1083,15 @@ class API:
                             ),
                         )
                     elif level == 5:
+                        if ban_days:
+                            ban_seconds = ban_days * 86400
+                        else:
+                            ban_seconds = await self.data.guild(guild).bandays.softban() * 86400
+
                         await guild.ban(
                             member,
                             reason=audit_reason,
-                            delete_message_days=ban_days
-                            or await self.data.guild(guild).bandays.ban(),
+                            delete_message_seconds=ban_seconds
                         )
                 except discord.errors.HTTPException as e:
                     log.warn(
