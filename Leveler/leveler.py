@@ -317,7 +317,7 @@ class Leveler(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    async def profile(self, ctx, user: discord.Member = None):
+    async def profile(self, ctx, user: discord.Member|None = None):
         """Show your leveler progress. Default to yourself."""
         if user is None:
             user = ctx.author
@@ -334,13 +334,17 @@ class Leveler(commands.Cog):
         await ctx.send(file=discord.File(img))
 
     async def listener(self, message):
-        if type(message.author) != discord.Member:
+
+        if not isinstance(message.author, discord.Member):
             # throws an error when webhooks talk, this fixes it
             return
-        if type(message.channel) != discord.channel.TextChannel:
+
+        if not isinstance(message.channel, discord.TextChannel):
             return
+
         if message.author.bot:
             return
+
         if await self.profiles.data.guild(message.guild).whitelist():
             if message.channel.id not in await self.profiles._get_guild_channels(
                 message.author.guild
@@ -463,7 +467,7 @@ class Leveler(commands.Cog):
 
     @profileset.command()
     @commands.guild_only()
-    async def background(self, ctx, *, link: str = None):
+    async def background(self, ctx, *, link: str|None = None):
         """Change background image of your profile."""
         await self.profiles._set_background(ctx.author, link)
         await ctx.send(_("Background image is now:") + str(link))
@@ -551,7 +555,7 @@ class Leveler(commands.Cog):
     @whitelist.command(name="add")
     @checks.mod_or_permissions(manage_messages=True)
     @commands.guild_only()
-    async def _add(self, ctx, channel: discord.TextChannel = None):
+    async def _add(self, ctx, channel: discord.TextChannel|None = None):
         """Add a channel to the whitelist."""
         if channel is None:
             channel = ctx.channel
@@ -573,7 +577,7 @@ class Leveler(commands.Cog):
     @whitelist.command(name="remove")
     @checks.mod_or_permissions(manage_messages=True)
     @commands.guild_only()
-    async def _remove(self, ctx, channel: discord.TextChannel = None):
+    async def _remove(self, ctx, channel: discord.TextChannel|None = None):
         """Delete a channel from the whitelist."""
         if channel is None:
             channel = ctx.channel
@@ -612,7 +616,7 @@ class Leveler(commands.Cog):
     @blacklist.command(name="add")
     @checks.mod_or_permissions(manage_messages=True)
     @commands.guild_only()
-    async def __add(self, ctx, channel: discord.TextChannel = None):
+    async def __add(self, ctx, channel: discord.TextChannel|None = None):
         """Add a channel to the blacklist."""
         if channel is None:
             channel = ctx.channel
@@ -634,7 +638,7 @@ class Leveler(commands.Cog):
     @blacklist.command(name="remove")
     @checks.mod_or_permissions(manage_messages=True)
     @commands.guild_only()
-    async def __remove(self, ctx, channel: discord.TextChannel = None):
+    async def __remove(self, ctx, channel: discord.TextChannel|None = None):
         """Remove a channel from the blacklist."""
         if channel is None:
             channel = ctx.channel
@@ -689,7 +693,7 @@ class Leveler(commands.Cog):
     @levelerset.command()
     @checks.is_owner()
     @commands.guild_only()
-    async def setlevel(self, ctx, level: int, member: discord.Member = None):
+    async def setlevel(self, ctx, level: int, member: discord.Member|None = None):
         """Modify an user's level"""
         if member is None:
             member = ctx.message.author
@@ -705,7 +709,7 @@ class Leveler(commands.Cog):
     @levelerset.command()
     @checks.is_owner()
     @commands.guild_only()
-    async def setxp(self, ctx, xp: int, member: discord.Member = None):
+    async def setxp(self, ctx, xp: int, member: discord.Member|None = None):
         """Modify an user's xp."""
         if member is None:
             member = ctx.message.author

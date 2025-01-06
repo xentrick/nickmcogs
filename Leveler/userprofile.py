@@ -100,11 +100,20 @@ class UserProfile:
                 if rl in member.roles:
                     return True
                 else:
-                    to_remove = [member.guild.get_role(r) for r in roles.values() if r != v]
-                    log.debug(f"Removing old leveler roles: {to_remove}")
-                    await member.remove_roles(*to_remove, reason="User leveled up")
-                    log.debug(f"Adding leveler role: {rl.name}")
-                    await member.add_roles(rl, reason="User leveled up")
+                    to_remove = []
+                    for r in roles.values():
+                        if r == v:
+                            continue
+                        grole = member.guild.get_role(r)
+                        if grole and grole in member.roles:
+                            to_remove.append(grole)
+                    # to_remove = [member.guild.get_role(r) for r in roles.values() if r != v]
+                    if to_remove:
+                        log.debug(f"Removing old leveler roles: {to_remove}")
+                        await member.remove_roles(*to_remove, reason="User leveled up")
+                    if rl:
+                        log.debug(f"Adding leveler role: {rl.name}")
+                        await member.add_roles(rl, reason="User leveled up")
                     return True
             else:
                 pass
@@ -215,10 +224,8 @@ class UserProfile:
 
     async def _get_background(self, member):
         userbg = await self.data.member(member).background()
-        log.info(f"Userbg URL: {userbg}")
         if userbg is None:
             userbg = await self.data.guild(member.guild).defaultbg()
-            log.debug(f"Userbg Default URL: {userbg}")
         return userbg
 
     async def _set_description(self, member, description: str):
