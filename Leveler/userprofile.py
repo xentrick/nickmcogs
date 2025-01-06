@@ -215,10 +215,11 @@ class UserProfile:
 
     async def _get_background(self, member):
         userbg = await self.data.member(member).background()
+        log.info(f"Userbg URL: {userbg}")
         if userbg is None:
-            return await self.data.guild(member.guild).defaultbg()
-        else:
-            return userbg
+            userbg = await self.data.guild(member.guild).defaultbg()
+            log.debug(f"Userbg Default URL: {userbg}")
+        return userbg
 
     async def _set_description(self, member, description: str):
         await self.data.member(member).description.set(description)

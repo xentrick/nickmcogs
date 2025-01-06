@@ -241,7 +241,7 @@ class WarnSystem(SettingsMixin, AutomodMixin, BaseCog, metaclass=CompositeMetaCl
     ):
         """No need to repeat, let's do what's common to all 5 warnings."""
         reason = await self.api.format_reason(ctx.guild, reason)
-        if reason and len(reason) > 2000:  # embed limits
+        if reason and len(reason) > 1024:  # embed limits
             await ctx.send(
                 _(
                     "The reason is too long for an embed.\n\n"

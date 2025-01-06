@@ -116,7 +116,11 @@ class Leveler(commands.Cog):
                 return BytesIO(img)
 
     async def get_background(self, url):
-        async with self._session.get(url) as f:
+        log.debug(f"Fetching background image: {url}")
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0"
+        }
+        async with self._session.get(url, headers=headers) as f:
             data = await f.read()
             return Image.open(BytesIO(data))
 
@@ -251,8 +255,11 @@ class Leveler(commands.Cog):
         avatar = await self.get_avatar(user)
         try:
             bg = await self.get_background(await self.profiles._get_background(user))
-        except:
+            log.debug(f"Background URL: {bg}")
+        except Exception as exc:
+            log.debug("Error getting background image: %s", exc)
             bg = None
+
         default = await self.profiles.data.guild(user.guild).defaultrole()
         data = {
             "avatar_data": avatar,
