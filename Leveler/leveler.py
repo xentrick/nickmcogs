@@ -20,9 +20,13 @@ import functools
 import textwrap
 from pathlib import Path
 
+from Leveler.util import remove_emoji
+
 log = logging.getLogger("red.nickmcogs.Leveler")
 
 _ = Translator("Leveler", __file__)
+
+"RF | nickm 🏆"
 
 
 @cog_i18n(_)
@@ -101,7 +105,7 @@ class Leveler(commands.Cog):
         self.restart = False
         await ctx.send(_("Resets in 30 seconds max"), delete_after=30)
 
-    async def get_avatar(self, user):
+    async def get_avatar(self, user: discord.Member):
         try:
             res = BytesIO()
             await user.display_avatar.replace(format="png", size=1024).save(
@@ -115,7 +119,7 @@ class Leveler(commands.Cog):
                 img = await r.content.read()
                 return BytesIO(img)
 
-    async def get_background(self, url):
+    async def get_background(self, url: str):
         log.debug(f"Fetching background image: {url}")
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0"
@@ -148,7 +152,17 @@ class Leveler(commands.Cog):
         return im
 
     def make_full_profile(
-        self, avatar_data, user, xp, nxp, lvl, minone, elo, ldb, desc, bg=None
+        self,
+        avatar_data: BytesIO,
+        user: discord.Member,
+        xp: int,
+        nxp: int,
+        lvl: int,
+        minone: int,
+        elo: str,
+        ldb: int,
+        desc: str,
+        bg=None,
     ):
         img = Image.new("RGBA", (340, 390), (17, 17, 17, 255))
         if bg is not None:
@@ -160,13 +174,12 @@ class Leveler(commands.Cog):
                 bg = bg.resize((int(bg_width / (ratio)), int(bg_height / ratio)))
             bg = bg.convert("RGBA")
             bg.putalpha(128)
-            offset = 0
             if bg.size[0] >= 340:
-                offset = (int((-(bg.size[0] - 340) / 2)), 0)
+                box_offset = (int((-(bg.size[0] - 340) / 2)), 0)
             if bg.size[0] < 340:
-                offset = (0, int((-(bg.size[1] - 390) / 2)))
+                box_offset = (0, int((-(bg.size[1] - 390) / 2)))
 
-            img.paste(bg, offset, bg)
+            img.paste(bg, box_offset, bg)
         img = self.add_corners(img, 10)
         draw = ImageDraw.Draw(img)
         usercolor = (225, 4, 72)  # user.color.to_rgb()
@@ -210,7 +223,9 @@ class Leveler(commands.Cog):
         draw.text((10, 180), lvl_str, fill="white", font=font3)
         draw.text((10, 220), ldb_str, fill="white", font=font3)
         draw.text((10, 260), rank_str, fill="white", font=font3)
-        nick = user.display_name
+        nick = remove_emoji(user.display_name)
+
+        log.debug(f"Nickname:{nick}")
         if font2.getlength(nick) > 150:
             nick = nick[:15] + "..."
 
@@ -232,9 +247,16 @@ class Leveler(commands.Cog):
         )
 
         draw.text((162, 14), f"{nick}", fill=usercolor, font=font2)
-        draw.text(
-            (162, 40), f"{user.name}#{user.discriminator}", fill=usercolor, font=font1
-        )
+        if user.discriminator == "0":
+            draw.text((162, 40), f"{user.name}", fill=usercolor, font=font1)
+        else:
+            draw.text(
+                (162, 40),
+                f"{user.name}#{user.discriminator}",
+                fill=usercolor,
+                font=font1,
+            )
+
         margin = 162
         offset = 70
         count = 0
@@ -250,7 +272,7 @@ class Leveler(commands.Cog):
         temp.name = "profile.png"
         return temp
 
-    async def profile_data(self, user):
+    async def profile_data(self, user: discord.Member):
         """Async get user profile data to pass to image creator"""
         avatar = await self.get_avatar(user)
         try:
@@ -293,9 +315,9 @@ class Leveler(commands.Cog):
                 data["elo"] = default if default else self.defaultrole
             else:
                 if str(lvl) in roles.keys():
-                    data["elo"] = discord.utils.get(
-                        user.guild.roles, id=roles[str(lvl)]
-                    ).name
+                    elo_role = discord.utils.get(user.guild.roles, id=roles[str(lvl)])
+                    if elo_role:
+                        data["elo"] = elo_role.name
                 else:
                     tmp = 0
                     log.debug(f"User LVL: {lvl}")
@@ -312,12 +334,13 @@ class Leveler(commands.Cog):
                         test_rn = user.get_role(tmp)
                         log.debug(f"Tmp: {tmp} Role Name: {test_rn}")
                         log.debug(f"RL: {rl}")
-                        data["elo"] = rl.name
+                        if rl:
+                            data["elo"] = rl.name
         return data
 
     @commands.command()
     @commands.guild_only()
-    async def profile(self, ctx, user: discord.Member|None = None):
+    async def profile(self, ctx, user: discord.Member | None = None):
         """Show your leveler progress. Default to yourself."""
         if user is None:
             user = ctx.author
@@ -326,7 +349,7 @@ class Leveler(commands.Cog):
         task = functools.partial(self.make_full_profile, **data)
         task = self.bot.loop.run_in_executor(None, task)
         try:
-            img = await asyncio.wait_for(task, timeout=60)
+            img: BytesIO = await asyncio.wait_for(task, timeout=60)
         except asyncio.TimeoutError:
             return
 
@@ -334,7 +357,6 @@ class Leveler(commands.Cog):
         await ctx.send(file=discord.File(img))
 
     async def listener(self, message):
-
         if not isinstance(message.author, discord.Member):
             # throws an error when webhooks talk, this fixes it
             return
@@ -467,7 +489,7 @@ class Leveler(commands.Cog):
 
     @profileset.command()
     @commands.guild_only()
-    async def background(self, ctx, *, link: str|None = None):
+    async def background(self, ctx, *, link: str | None = None):
         """Change background image of your profile."""
         await self.profiles._set_background(ctx.author, link)
         await ctx.send(_("Background image is now:") + str(link))
@@ -555,7 +577,7 @@ class Leveler(commands.Cog):
     @whitelist.command(name="add")
     @checks.mod_or_permissions(manage_messages=True)
     @commands.guild_only()
-    async def _add(self, ctx, channel: discord.TextChannel|None = None):
+    async def _add(self, ctx, channel: discord.TextChannel | None = None):
         """Add a channel to the whitelist."""
         if channel is None:
             channel = ctx.channel
@@ -577,7 +599,7 @@ class Leveler(commands.Cog):
     @whitelist.command(name="remove")
     @checks.mod_or_permissions(manage_messages=True)
     @commands.guild_only()
-    async def _remove(self, ctx, channel: discord.TextChannel|None = None):
+    async def _remove(self, ctx, channel: discord.TextChannel | None = None):
         """Delete a channel from the whitelist."""
         if channel is None:
             channel = ctx.channel
@@ -616,7 +638,7 @@ class Leveler(commands.Cog):
     @blacklist.command(name="add")
     @checks.mod_or_permissions(manage_messages=True)
     @commands.guild_only()
-    async def __add(self, ctx, channel: discord.TextChannel|None = None):
+    async def __add(self, ctx, channel: discord.TextChannel | None = None):
         """Add a channel to the blacklist."""
         if channel is None:
             channel = ctx.channel
@@ -638,7 +660,7 @@ class Leveler(commands.Cog):
     @blacklist.command(name="remove")
     @checks.mod_or_permissions(manage_messages=True)
     @commands.guild_only()
-    async def __remove(self, ctx, channel: discord.TextChannel|None = None):
+    async def __remove(self, ctx, channel: discord.TextChannel | None = None):
         """Remove a channel from the blacklist."""
         if channel is None:
             channel = ctx.channel
@@ -693,7 +715,7 @@ class Leveler(commands.Cog):
     @levelerset.command()
     @checks.is_owner()
     @commands.guild_only()
-    async def setlevel(self, ctx, level: int, member: discord.Member|None = None):
+    async def setlevel(self, ctx, level: int, member: discord.Member | None = None):
         """Modify an user's level"""
         if member is None:
             member = ctx.message.author
@@ -709,7 +731,7 @@ class Leveler(commands.Cog):
     @levelerset.command()
     @checks.is_owner()
     @commands.guild_only()
-    async def setxp(self, ctx, xp: int, member: discord.Member|None = None):
+    async def setxp(self, ctx, xp: int, member: discord.Member | None = None):
         """Modify an user's xp."""
         if member is None:
             member = ctx.message.author
