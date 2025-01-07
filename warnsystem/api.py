@@ -1211,7 +1211,7 @@ class API:
             if automod:
                 # This function can be pretty heavy, and the response can be seriously delayed
                 # because of this, so we make it a side process instead
-                self.bot.loop.create_task(
+                asyncio.create_task(
                     self.automod_check_for_autowarn(guild, member, author, level)
                 )
             self.bot.dispatch(
@@ -1460,7 +1460,7 @@ class API:
         """
         log.info("Enabling automod listeners and event loops.")
         self.bot.add_listener(self.automod_on_message, name="on_message")
-        self.automod_warn_task = self.bot.loop.create_task(self.automod_warn_loop())
+        self.automod_warn_task = asyncio.create_task(self.automod_warn_loop())
 
     def disable_automod(self):
         """

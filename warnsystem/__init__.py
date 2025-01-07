@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import importlib.util
 import re
@@ -204,7 +205,7 @@ async def setup(bot: Red):
         ) from e
     await bot.add_cog(n)
     await n.cache.init_automod_enabled()
-    n.task = bot.loop.create_task(n.api._loop_task())
+    n.task = asyncio.create_task(n.api._loop_task())
     if n.cache.automod_enabled:
         n.api.enable_automod()
     bot.tree.add_command(context_warn)

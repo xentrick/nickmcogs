@@ -373,7 +373,7 @@ class WarnSystem(SettingsMixin, AutomodMixin, commands.Cog, metaclass=CompositeM
             if not pred.result:
                 await ctx.send(_("Mass warn cancelled."))
                 return
-            task = self.bot.loop.create_task(update_message())
+            task = asyncio.create_task(update_message())
         try:
             fails = await self.api.warn(
                 guild=guild,
