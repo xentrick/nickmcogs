@@ -36,7 +36,7 @@ class Leveler(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.profiles = UserProfile()
-        self.loop = self.bot.loop.create_task(self.start())
+        self.loop = asyncio.create_task(self.start())
         self.restart = True
         self.defaultrole = _("New")
         self._session = aiohttp.ClientSession()
@@ -64,7 +64,7 @@ class Leveler(commands.Cog):
 
     def cog_unload(self):
         self.bot.remove_listener(self.listener)
-        asyncio.get_event_loop().create_task(self._session.close())
+        asyncio.create_task(self._session.close())
         self.loop.cancel()
 
     async def start(self):
@@ -346,12 +346,13 @@ class Leveler(commands.Cog):
             user = ctx.author
         data = await self.profile_data(user)
 
-        task = functools.partial(self.make_full_profile, **data)
-        task = self.bot.loop.run_in_executor(None, task)
-        try:
-            img: BytesIO = await asyncio.wait_for(task, timeout=60)
-        except asyncio.TimeoutError:
-            return
+        img = self.make_full_profile(**data) 
+        # task = functools.partial(self.make_full_profile, **data)
+        # task = self.bot.loop.run_in_executor(None, task)
+        # try:
+            # img: BytesIO = await asyncio.wait_for(task, timeout=60)
+        # except asyncio.TimeoutError:
+        #     return
 
         img.seek(0)
         await ctx.send(file=discord.File(img))
