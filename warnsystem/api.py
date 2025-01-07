@@ -8,8 +8,8 @@ from copy import deepcopy
 from collections import namedtuple
 from typing import Union, Optional, Iterable, Callable, Awaitable
 from datetime import datetime, timedelta, timezone
-from multiprocessing import TimeoutError
-from multiprocessing.pool import Pool
+# from multiprocessing import TimeoutError
+# from multiprocessing.pool import Pool
 from discord.asset import Asset
 
 from redbot.core import Config
@@ -182,7 +182,7 @@ class API:
         self.bot = bot
         self.data = config
         self.cache = cache
-        self.re_pool = Pool(maxtasksperchild=1000)
+        # self.re_pool = Pool(maxtasksperchild=1000)
         self.regex_timeout = 1
         self.warned_guilds = []  # see automod_check_for_autowarn
         self.antispam = {}  # see automod_process_antispam
@@ -1535,18 +1535,18 @@ class API:
         """
         guild = message.guild
         try:
-            process = self.re_pool.apply_async(regex.findall, (message.content,))
-            task = functools.partial(process.get, timeout=self.regex_timeout)
-            new_task = self.bot.loop.run_in_executor(None, task)
-            search = await asyncio.wait_for(new_task, timeout=self.regex_timeout + 5)
-        except TimeoutError:
-            error_msg = (
-                f"[Guild {guild.id}] Automod: regex process took too long. "
-                f"Removing from memory. Offending regex: {regex.pattern}"
-            )
-            log.warning(error_msg)
-            return (False, [])
-            # we certainly don't want to be performing multiple triggers if this happens
+            regex.findall(message.content)
+            task = asyncio.create_task(regex.findall(message.content))
+            async with asyncio.timeout(self.regex_timeout + 5):
+                search = await task
+        # except TimeoutError:
+        #     error_msg = (
+        #         f"[Guild {guild.id}] Automod: regex process took too long. "
+        #         f"Removing from memory. Offending regex: {regex.pattern}"
+        #     )
+        #     log.warning(error_msg)
+        #     return (False, [])
+        #     # we certainly don't want to be performing multiple triggers if this happens
         except asyncio.TimeoutError:
             error_msg = (
                 f"[Guild {guild.id}] Automod: regex asyncio timed out. "

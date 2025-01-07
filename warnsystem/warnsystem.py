@@ -1176,4 +1176,4 @@ class WarnSystem(SettingsMixin, AutomodMixin, commands.Cog, metaclass=CompositeM
         # stop checking for unmute and unban
         self.task.cancel()
         self.api.disable_automod()
-        self.api.re_pool.close()
+        # self.api.re_pool.close()
