@@ -1,9 +1,9 @@
-import asyncio
 import logging
 import importlib.util
 import re
 
 from redbot.core.i18n import Translator
+from redbot.core.bot import Red
 from datetime import datetime, timedelta
 
 try:
@@ -17,19 +17,12 @@ if not importlib.util.find_spec("dateutil"):
         "Use the command `[p]pipinstall python-dateutil` or type "
         "`pip3 install python-dateutil` in the terminal to install the library."
     )
-if not importlib.util.find_spec("laggron_utils"):
-    raise CogLoadError(
-        "You need the `laggron_utils` package for any cog from Laggron's Dumb Cogs. "
-        "Use the command `[p]pipinstall git+https://github.com/retke/Laggron-utils.git` "
-        "or type `pip3 install -U git+https://github.com/retke/Laggron-utils.git` in the "
-        "terminal to install the library."
-    )
 
-from laggron_utils import init_logger, close_logger
 from .warnsystem import WarnSystem
+from .context_menus import context_warn
 
 _ = Translator("WarnSystem", __file__)
-log = logging.getLogger("red.nickmcogs.warnsystem")
+log = logging.getLogger("red.laggron.warnsystem")
 
 
 async def _save_backup(config):
@@ -185,12 +178,10 @@ async def update_config(bot, config):
         # phew
 
 
-async def setup(bot):
-    init_logger(log, "WarnSystem")
+async def setup(bot: Red):
     n = WarnSystem(bot)
     # the cog conflicts with the core Warnings cog, we must check that
     if "Warnings" in bot.cogs:
-        close_logger(log)  # still need some cleaning up
         raise CogLoadError(
             "You need to unload the Warnings cog to load "
             "this cog. Type `[p]unload warnings` and try again."
@@ -203,7 +194,6 @@ async def setup(bot):
             "Contact support for further instructions.",
             exc_info=e,
         )
-        close_logger(log)  # still need some cleaning up
         raise CogLoadError(
             "After an update, the cog tried to perform changes to the saved data but an error "
             "occured. Read your console output or warnsystem.log (located over "
@@ -214,7 +204,8 @@ async def setup(bot):
         ) from e
     await bot.add_cog(n)
     await n.cache.init_automod_enabled()
-    n.task = asyncio.create_task(n.api._loop_task())
+    n.task = bot.loop.create_task(n.api._loop_task())
     if n.cache.automod_enabled:
         n.api.enable_automod()
+    bot.tree.add_command(context_warn)
     log.debug("Cog successfully loaded on the instance.")
