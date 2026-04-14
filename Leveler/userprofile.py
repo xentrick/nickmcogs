@@ -148,22 +148,30 @@ class UserProfile:
     async def _get_guild_roles(self, guild: discord.Guild):
         return await self.data.guild(guild).roles()
 
-    async def _add_guild_channel(self, guild: discord.Guild, channel: discord.TextChannel):
+    async def _add_guild_channel(
+        self, guild: discord.Guild, channel: discord.TextChannel
+    ):
         async with self.data.guild(guild).wlchannels() as chanlist:
             chanlist.append(channel)
 
-    async def _remove_guild_channel(self, guild: discord.Guild, channel: discord.TextChannel):
+    async def _remove_guild_channel(
+        self, guild: discord.Guild, channel: discord.TextChannel
+    ):
         async with self.data.guild(guild).wlchannels() as chanlist:
             chanlist.remove(channel)
 
     async def _get_guild_channels(self, guild: discord.Guild):
         return await self.data.guild(guild).wlchannels()
 
-    async def _add_guild_blacklist(self, guild: discord.Guild, channel: discord.TextChannel):
+    async def _add_guild_blacklist(
+        self, guild: discord.Guild, channel: discord.TextChannel
+    ):
         async with self.data.guild(guild).blchannels() as chanlist:
             chanlist.append(channel)
 
-    async def _remove_guild_blacklist(self, guild: discord.Guild, channel: discord.TextChannel):
+    async def _remove_guild_blacklist(
+        self, guild: discord.Guild, channel: discord.TextChannel
+    ):
         async with self.data.guild(guild).blchannels() as chanlist:
             chanlist.remove(channel)
 
@@ -219,7 +227,9 @@ class UserProfile:
     async def _get_cooldown(self, guild: discord.Guild):
         return await self.data.guild(guild).cooldown()
 
-    async def _set_background(self, member: discord.Member, background: str |None=None):
+    async def _set_background(
+        self, member: discord.Member, background: str | None = None
+    ):
         await self.data.member(member).background.set(background)
 
     async def _get_background(self, member: discord.Member):
@@ -239,7 +249,7 @@ class UserProfile:
         infos = sorted(datas, key=lambda x: datas[x]["exp"], reverse=True)
         return infos.index(member.id) + 1
 
-    async def _get_leaderboard(self, guild: discord.Guild):
+    async def _get_leaderboard(self, guild: discord.Guild, limit=9):
         datas = await self.data.all_members(guild)
         infos = sorted(datas, key=lambda x: datas[x]["exp"], reverse=True)
         res = []
@@ -253,6 +263,6 @@ class UserProfile:
             tmp["today"] = cur["today"]
             res.append(tmp)
             count += 1
-            if count == 10:
+            if count > limit:
                 break
         return res

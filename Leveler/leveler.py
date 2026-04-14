@@ -346,11 +346,11 @@ class Leveler(commands.Cog):
             user = ctx.author
         data = await self.profile_data(user)
 
-        img = self.make_full_profile(**data) 
+        img = self.make_full_profile(**data)
         # task = functools.partial(self.make_full_profile, **data)
         # task = self.bot.loop.run_in_executor(None, task)
         # try:
-            # img: BytesIO = await asyncio.wait_for(task, timeout=60)
+        # img: BytesIO = await asyncio.wait_for(task, timeout=60)
         # except asyncio.TimeoutError:
         #     return
 
@@ -431,20 +431,29 @@ class Leveler(commands.Cog):
     @commands.guild_only()
     async def toplevel(self, ctx):
         """Show the server leaderboard !"""
-        ld = await self.profiles._get_leaderboard(ctx.guild)
+        ld = await self.profiles._get_leaderboard(ctx.guild, limit=20)
         emb = discord.Embed(title=_("Ranking"))
-        for i in range(len(ld)):
-            cur = ld[i]
+
+        names = []
+        levels = []
+        messages = []
+
+        for cur in ld:
             user = ctx.guild.get_member(cur["id"])
             if user is None:
                 await self._reset_member(ctx.guild, cur["id"])
             else:
-                txt = (
-                    _("Level:")
-                    + " {} | {} XP | {} ".format(cur["lvl"], cur["xp"], cur["today"])
-                    + _("Messages Today!")
-                )
-                emb.add_field(name="{}".format(user.global_name), value=txt)
+                names.append(user.global_name or user.name)
+                levels.append(f"{cur.get('lvl')} | {cur.get('xp')} XP")
+                messages.append(str(cur.get("today")))
+
+        if names:
+            emb.add_field(name=_("Name"), value="\n".join(names), inline=True)
+            emb.add_field(name=_("Level"), value="\n".join(levels), inline=True)
+            emb.add_field(
+                name=_("Messages Today"), value="\n".join(messages), inline=True
+            )
+
         await ctx.send(embed=emb)
 
     @commands.group()
