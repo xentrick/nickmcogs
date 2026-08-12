@@ -166,6 +166,17 @@ class AdvancedMemberSelect:
         if args.display_name:
             members = self._name_regex(members, args.display_name, "display_name")
         if args.activity:
+            if not self.ctx.bot.intents.presences:
+                # Member.activities is always empty without the presence intent,
+                # so this filter would silently select nobody. Fail loudly instead
+                # of letting a moderator think the search came back clean.
+                raise BadArgument(
+                    _(
+                        "`--activity` needs the presence intent, which this bot "
+                        "wasn't granted. Custom statuses aren't visible, so this "
+                        "filter can't match anyone."
+                    )
+                )
             members = self._status_regex(members, args.activity)
         if args.only_humans:
             members = list(filter(lambda x: not x.bot, members))
